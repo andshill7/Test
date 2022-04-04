@@ -1,0 +1,56 @@
+az eventhubs namespace create \
+--subscription 7d688c8f-bcd7-4b2a-8dff-cbd9bc1f218e \
+--name wiz-Eventhub \
+--resource-group Wiz-Events \
+--location eastus \
+--sku Standard \
+--capacity 1 \
+--maximum-throughput-units 8 \
+--enable-auto-inflate \
+--enable-kafka
+
+
+az eventhubs namespace authorization-rule create \
+--subscription 7d688c8f-bcd7-4b2a-8dff-cbd9bc1f218e \
+--name logsWriter \
+--namespace-name wiz-Eventhub \
+--resource-group Wiz-Events \
+--rights Send
+
+
+az eventhubs eventhub create \
+--name wiz-collect-activity-logs \
+--namespace-name wiz-Eventhub \
+--resource-group Wiz-Events \
+--message-retention 1 \
+--partition-count 4
+
+
+az eventhubs eventhub authorization-rule create \
+--name logsReader \
+--eventhub-name wiz-collect-activity-logs \
+--namespace-name wiz-Eventhub \
+--resource-group Wiz-Events \
+--rights Listen
+
+
+az eventhubs eventhub authorization-rule keys list \
+--name logsReader \
+--eventhub-name wiz-collect-activity-logs \
+--namespace-name wiz-Eventhub \
+--resource-group Wiz-Events \
+--query primaryConnectionString
+
+
+az monitor diagnostic-settings subscription create \
+--subscription 7d688c8f-bcd7-4b2a-8dff-cbd9bc1f218e \
+--name wiz-collect-activity-logs \
+--location global \
+--logs '[{"category": "Administrative","enabled": true}, {"category": "Autoscale","enabled": true}]' \
+--event-hub-name wiz-collect-activity-logs \
+--event-hub-auth-rule /subscriptions/7d688c8f-bcd7-4b2a-8dff-cbd9bc1f218e/resourceGroups/Wiz-Events/providers/Microsoft.EventHub/namespaces/wiz-Eventhub/authorizationrules/logsWriter
+
+
+Use the SAS token from the event hub itself.
+
+Endpoint=sb://wiz-eventhub.servicebus.windows.net/;SharedAccessKeyName=logsReader;SharedAccessKey=ljpD00W5cqIKESMgGAvXaWc6T0XOJX8YPI28SxP03QI=;EntityPath=wiz-collect-activity-logs
