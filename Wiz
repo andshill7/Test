@@ -1,0 +1,1 @@
+https://login.microsoftonline.com/8d09f28d-2b54-4761-98f1-de38762cd939/oauth2/authorize?client_id=98eedb1f-aee9-4e9c-b097-e3360dd701db&response_type=code&state=%7B%22tenantId%22:%228d09f28d-2b54-4761-98f1-de38762cd939%22%7D&redirect_uri=https://app.wiz.io/settings/connectors/app-consent-result
